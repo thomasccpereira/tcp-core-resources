@@ -1,0 +1,33 @@
+{
+  "configurations" : [
+    {
+      "id" : "E5D5148A-AC2D-41E3-8B33-383E188F1045",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : {
+      "targets" : [
+        {
+          "containerPath" : "container:",
+          "identifier" : "CoreResources",
+          "name" : "CoreResources"
+        }
+      ]
+    },
+    "testTimeoutsEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "CoreResourcesTests",
+        "name" : "CoreResourcesTests"
+      }
+    }
+  ],
+  "version" : 1
+}
