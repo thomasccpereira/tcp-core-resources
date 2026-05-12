@@ -137,5 +137,45 @@ struct ArrayCollectionTests {
             Issue.record("Unexpected error type: \(error)")
          }
       }
+
+      @Test func testConcurrentForEachRunsWithLimitNormalization() async throws {
+         actor Collector {
+            private(set) var values: [Int] = []
+
+            func append(_ value: Int) {
+               values.append(value)
+            }
+         }
+
+         let input = Array(1...6)
+         let collector = Collector()
+
+         try await input.concurrentForEach(limit: 0) { value in
+            await collector.append(value)
+         }
+
+         let output = await collector.values
+         #expect(Set(output) == Set(input))
+         #expect(output.count == input.count)
+      }
+
+      @Test func testConcurrentForEachEmptyInputReturnsImmediately() async throws {
+         actor Counter {
+            private(set) var value = 0
+
+            func increment() {
+               value += 1
+            }
+         }
+
+         let input: [Int] = []
+         let counter = Counter()
+
+         try await input.concurrentForEach(limit: 2) { _ in
+            await counter.increment()
+         }
+
+         #expect(await counter.value == 0)
+      }
    }
 }

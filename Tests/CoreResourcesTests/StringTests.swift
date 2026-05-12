@@ -86,12 +86,54 @@ struct StringsTests {
             #expect("123".formattedBrazilianTaxID == "123")
             #expect("  12345  ".formattedBrazilianTaxID == "12345")
          }
+         
+         @Test func testFormattedAsCompanyTaxIDIncrementalMask() {
+            #expect("1".formattedAsCompanyTaxID == "1")
+            #expect("12".formattedAsCompanyTaxID == "12")
+            #expect("123".formattedAsCompanyTaxID == "12.3")
+            #expect("123456789".formattedAsCompanyTaxID == "12.345.678/9")
+            #expect("1234567890123".formattedAsCompanyTaxID == "12.345.678/9012-3")
+         }
+         
+         @Test func testFormattedAsCompanyTaxIDStripsAndTruncates() {
+            #expect("12a34b56c7890d1234".formattedAsCompanyTaxID == "12.345.678/9012-34")
+         }
       }
    }
    
    @Suite
    struct StringRanging {
+      @Test func testClosedRangeAtBounds() {
+         #expect("Hello, World"[0...4] == "Hello")
+      }
       
+      @Test func testHalfOpenRangeAtBounds() {
+         #expect("Hello, World"[0..<5] == "Hello")
+      }
+      
+      @Test func testSingleCharacterRange() {
+         #expect("Hello, World"[2...2] == "l")
+      }
+   }
+   
+   @Suite
+   struct StringDateParsing {
+      @Test func testStringDateValid() {
+         let parsed = "2024-07-05T14:03:09".date
+         #expect(parsed != nil)
+         let components = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute, .second], from: parsed!)
+         #expect(components.year == 2024)
+         #expect(components.month == 7)
+         #expect(components.day == 5)
+         #expect(components.hour == 14)
+         #expect(components.minute == 3)
+         #expect(components.second == 9)
+      }
+      
+      @Test func testStringDateInvalidInputs() {
+         #expect("   ".date == nil)
+         #expect("2024-02-30T10:20:30".date != nil)
+      }
    }
    
    @Suite
@@ -138,11 +180,28 @@ struct StringsTests {
          #expect("bad..dots@example.com".isEmailValid == false)
       }
       
+      @Test func testEmailValidationEdgeCases() {
+         #expect("  User.Name+tag@EXAMPLE.COM  ".isEmailValid == true)
+         #expect("a@b.c".isEmailValid == false)
+         #expect("a..b@example.com".isEmailValid == false)
+         #expect(".abc@example.com".isEmailValid == false)
+         #expect("abc.@example.com".isEmailValid == false)
+         #expect("a@b@c.com".isEmailValid == false)
+      }
+      
       @Test func testHTMLEscape() {
          let html = "<b>Hello & \"you\"</b>"
          let escaped = html.validHTML
          #expect(escaped.contains("&lt;b&gt;"))
          #expect(escaped.contains("&amp;"))
+      }
+
+      @Test func testHTMLEscapePreservesEntitiesAndEscapesApostrophe() {
+         let html = "Already &lt;safe&gt; & still 'quoted'"
+         let escaped = html.validHTML
+         #expect(escaped.contains("&lt;safe&gt;"))
+         #expect(escaped.contains("&amp; still"))
+         #expect(escaped.contains("&#39;quoted&#39;"))
       }
    }
    
