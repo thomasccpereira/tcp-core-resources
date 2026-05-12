@@ -23,8 +23,6 @@ public extension Date {
 
 // MARK: - Datetime
 public extension Date {
-   var localTime: Date { self } // or delete this property
-   
    static var uses24Hours: Bool {
       guard let dateFormat = DateFormatter.dateFormat(fromTemplate: "j", options: 0, locale: Locale.current) else { return true }
       return dateFormat.firstIndex(of: "a") == nil
@@ -38,6 +36,14 @@ public extension Date {
       // https://www.epochconverter.com/coredata
       let timeInterval = now.timeIntervalSince1970 - 978307200.0
       return timeInterval
+   }
+   
+   var localTime: Date { self } // or delete this property
+   
+   /// Extracts minutes-since-midnight (0…1439) from a `Date`.
+   var minutesFromDate: Int {
+      let components = Calendar.current.dateComponents([.hour, .minute], from: self)
+      return (components.hour ?? 0) * 60 + (components.minute ?? 0)
    }
 }
 

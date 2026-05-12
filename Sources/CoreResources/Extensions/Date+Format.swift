@@ -52,3 +52,45 @@ public extension Date {
       return DateFormatter.current(dateFormat: DateFormats.timeWithSecondsAMPM).string(from: self)
    }
 }
+
+public enum GMTOffset {
+   /// Formats a GMT offset in seconds into a display-friendly label.
+   /// Examples: `"GMT+1"`, `"GMT-5"`, `"GMT+5:30"`, `"GMT-3:45"`
+   static func label(forSeconds seconds: Int) -> String {
+      let totalSeconds = abs(seconds)
+      let hours = totalSeconds / 3600
+      let minutes = (totalSeconds % 3600) / 60
+      let sign = seconds >= 0 ? "+" : "-"
+      if minutes > 0 {
+         return "GMT\(sign)\(hours):\(String(format: "%02d", minutes))"
+      }
+      return "GMT\(sign)\(hours)"
+   }
+}
+
+public struct FormattedTime: Equatable {
+   let hour: String
+   let minute: String
+   let period: String
+}
+
+/// Converts minutes‑from‑midnight to display strings respecting the device’s 12h/24h preference.
+public func formatTime(totalMinutes: Int, uses12Hour: Bool) -> FormattedTime {
+   let hour24 = totalMinutes / 60 % 24
+   let minute = totalMinutes % 60
+   let minuteStr = String(format: "%02d", minute)
+   let hourStr: String
+   let period: String
+
+   if uses12Hour {
+      let display = hour24 % 12
+      let display12 = display == 0 ? 12 : display
+      hourStr = String(format: "%02d", display12)
+      period = hour24 >= 12 ? "PM" : "AM"
+   } else {
+      hourStr = String(format: "%02d", hour24)
+      period = hour24 >= 12 ? "PM" : "AM"
+   }
+   return FormattedTime(hour: hourStr, minute: minuteStr, period: period)
+}
+

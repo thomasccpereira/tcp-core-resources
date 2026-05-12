@@ -57,6 +57,19 @@ struct DateExtensionTests {
       // Allow tiny drift between the two reads of 'now'
       #expect(abs(got - expected) < 0.01) // 10 ms tolerance
    }
+
+   @Test func testMinutesFromDate() {
+      var components = DateComponents()
+      components.year = 2024
+      components.month = 7
+      components.day = 5
+      components.hour = 14
+      components.minute = 3
+      components.second = 9
+      let date = Calendar.current.date(from: components)!
+
+      #expect(date.minutesFromDate == 843)
+   }
    
    @Test func testIfDateHasPassed() {
       let pastDate: Date? = Date.distantPast
@@ -228,6 +241,32 @@ struct DateExtensionTests {
          #expect(parts.count == 2)
          #expect(parts[0].rangeOfCharacter(from: .decimalDigits) != nil)
          #expect(parts[1].rangeOfCharacter(from: .letters) != nil)
+      }
+
+      @Test func testGMTOffsetLabel() {
+         #expect(GMTOffset.label(forSeconds: 3600) == "GMT+1")
+         #expect(GMTOffset.label(forSeconds: -18000) == "GMT-5")
+         #expect(GMTOffset.label(forSeconds: 19800) == "GMT+5:30")
+         #expect(GMTOffset.label(forSeconds: -13500) == "GMT-3:45")
+      }
+
+      @Test func testFormatTime24Hour() {
+         let formatted = formatTime(totalMinutes: 14 * 60 + 3, uses12Hour: false)
+         #expect(formatted.hour == "14")
+         #expect(formatted.minute == "03")
+         #expect(formatted.period == "PM")
+      }
+
+      @Test func testFormatTime12Hour() {
+         let midnight = formatTime(totalMinutes: 0, uses12Hour: true)
+         #expect(midnight.hour == "12")
+         #expect(midnight.minute == "00")
+         #expect(midnight.period == "AM")
+
+         let noon = formatTime(totalMinutes: 12 * 60, uses12Hour: true)
+         #expect(noon.hour == "12")
+         #expect(noon.minute == "00")
+         #expect(noon.period == "PM")
       }
    }
    
