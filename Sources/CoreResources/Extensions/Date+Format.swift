@@ -56,7 +56,7 @@ public extension Date {
 public enum GMTOffset {
    /// Formats a GMT offset in seconds into a display-friendly label.
    /// Examples: `"GMT+1"`, `"GMT-5"`, `"GMT+5:30"`, `"GMT-3:45"`
-   static func label(forSeconds seconds: Int) -> String {
+   public static func label(forSeconds seconds: Int) -> String {
       let totalSeconds = abs(seconds)
       let hours = totalSeconds / 3600
       let minutes = (totalSeconds % 3600) / 60
