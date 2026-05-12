@@ -69,9 +69,9 @@ public enum GMTOffset {
 }
 
 public struct FormattedTime: Equatable {
-   let hour: String
-   let minute: String
-   let period: String
+   public let hour: String
+   public let minute: String
+   public let period: String
 }
 
 /// Converts minutes‑from‑midnight to display strings respecting the device’s 12h/24h preference.
